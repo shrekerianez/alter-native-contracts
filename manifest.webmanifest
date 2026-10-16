@@ -1,0 +1,17 @@
+{
+  "name": "AlterNative — Рентабельность договора",
+  "short_name": "Рентабельность",
+  "description": "Расчёт экономики договора от поста до итоговой рентабельности.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f7",
+  "theme_color": "#f5f5f7",
+  "icons": [
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}
