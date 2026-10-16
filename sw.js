@@ -1,5 +1,15 @@
-const CACHE = 'alternative-rentability-v1.0.2';
-const ASSETS = ['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE = 'alternative-rentability-ios27-1';
+const ASSETS = [
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './app-v2.js',
+  './manifest.webmanifest',
+  './icons/icon-180.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -31,9 +41,9 @@ self.addEventListener('fetch', event => {
       }
       return response;
     } catch (error) {
-      const cached = await caches.match(event.request);
+      const cached = await caches.match(event.request, { ignoreSearch: true });
       if (cached) return cached;
-      if (event.request.mode === 'navigate') return caches.match('./index.html');
+      if (event.request.mode === 'navigate') return caches.match('./index.html', { ignoreSearch: true });
       throw error;
     }
   })());
