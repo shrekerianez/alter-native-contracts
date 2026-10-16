@@ -1,4 +1,4 @@
-const CACHE = 'alternative-rentability-v1.0.1';
+const CACHE = 'alternative-rentability-v1.0.2';
 const ASSETS = ['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install', event => {
@@ -10,37 +10,31 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)));
+    await self.clients.claim();
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    await Promise.all(clients.map(client => client.navigate(client.url).catch(() => undefined)));
+  })());
 });
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE).then(cache => cache.put('./index.html', copy));
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then(cached => {
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(event.request, { cache: 'no-store' });
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE);
+        cache.put(event.request, response.clone()).catch(() => undefined);
+      }
+      return response;
+    } catch (error) {
+      const cached = await caches.match(event.request);
       if (cached) return cached;
-      return fetch(event.request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE).then(cache => cache.put(event.request, copy));
-        return response;
-      });
-    })
-  );
+      if (event.request.mode === 'navigate') return caches.match('./index.html');
+      throw error;
+    }
+  })());
 });
