@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Рентабельность" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>AlterNative — Рентабельность договора</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar glass">
+      <div>
+        <div class="eyebrow">AlterNative</div>
+        <h1 id="screenTitle">Рентабельность</h1>
+      </div>
+      <button class="icon-button" id="btnExport" aria-label="Экспорт данных" title="Экспорт JSON">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0-11 4 4m-4-4L8 7M5 12v7h14v-7"/></svg>
+      </button>
+    </header>
+
+    <main id="mainContent">
+      <section class="screen active" data-screen="summary">
+        <div class="content">
+          <div class="status-row">
+            <span class="status-dot" id="offlineDot"></span>
+            <span id="offlineLabel">Локальный расчёт</span>
+            <span class="spacer"></span>
+            <span class="muted" id="saveStateLabel">Сохранено</span>
+          </div>
+
+          <section class="hero-card glass-strong">
+            <div class="hero-top">
+              <div>
+                <div class="caption">Расчётная стоимость без НДС</div>
+                <div class="hero-value" id="heroRevenue">0 ₽</div>
+              </div>
+              <div class="profit-pill" id="profitPill">0%</div>
+            </div>
+            <div class="hero-bottom">
+              <div><span>Прибыль</span><strong id="heroProfit">0 ₽</strong></div>
+              <div><span>Точка 0</span><strong id="heroBreakEven">0 ₽</strong></div>
+            </div>
+          </section>
+
+          <div class="kpi-grid">
+            <article class="kpi-card"><span>Себестоимость</span><strong id="kpiCost">0 ₽</strong><small>с накладными</small></article>
+            <article class="kpi-card"><span>УСН</span><strong id="kpiUsn">0 ₽</strong><small>с выручки без НДС</small></article>
+            <article class="kpi-card"><span>С НДС</span><strong id="kpiWithVat">0 ₽</strong><small id="vatHint">при ставке 5%</small></article>
+            <article class="kpi-card"><span>Штат</span><strong id="kpiHeadcount">0</strong><small>расчётных сотрудников</small></article>
+          </div>
+
+          <section class="group">
+            <div class="group-title">Договор</div>
+            <div class="form-card grouped">
+              <label class="field-row"><span>Объект</span><input id="contractName" type="text" autocomplete="off" /></label>
+              <label class="field-row"><span>Номер</span><input id="contractNumber" type="text" autocomplete="off" placeholder="необязательно" /></label>
+              <label class="field-row"><span>Срок, мес.</span><input id="contractMonths" type="number" min="1" step="1" inputmode="decimal" /></label>
+              <label class="field-row"><span>Цена договора</span><select id="priceMode"><option value="calculated">Рассчитать автоматически</option><option value="manual">Задать вручную</option></select></label>
+              <label class="field-row manual-price-row hidden"><span>Сумма</span><input id="manualPrice" type="number" min="0" step="1000" inputmode="decimal" /></label>
+              <label class="field-row manual-price-row hidden"><span>Сумма включает НДС</span><input class="ios-switch" id="manualIncludesVat" type="checkbox" /></label>
+            </div>
+          </section>
+
+          <section class="group">
+            <div class="group-head"><div class="group-title">Посты</div><button class="text-button" data-nav="posts">Все посты</button></div>
+            <div id="summaryPosts" class="stack"></div>
+          </section>
+
+          <section class="group">
+            <div class="group-title">Структура цены</div>
+            <div class="form-card breakdown" id="priceBreakdown"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="posts">
+        <div class="content">
+          <div class="section-intro">
+            <h2>Посты</h2>
+            <p>Расчёт начинается с поста. График поста определяет потребность в персонале, а уже персонал формирует ФОТ и себестоимость.</p>
+          </div>
+          <div id="postsList" class="stack"></div>
+          <button class="primary-button" id="btnAddPost">Добавить пост</button>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="costs">
+        <div class="content">
+          <div class="section-intro"><h2>Общие расходы</h2><p>Начальник охраны, подменные, транспорт, питание и оборудование не обязаны быть отдельными постами. Их стоимость распределяется на посты выбранным методом.</p></div>
+
+          <section class="group">
+            <div class="group-head"><div class="group-title">Общий персонал</div><button class="text-button" id="btnAddSharedStaff">Добавить</button></div>
+            <div id="sharedStaffList" class="stack"></div>
+          </section>
+
+          <section class="group">
+            <div class="group-head"><div class="group-title">Ежемесячные расходы</div><button class="text-button" id="btnAddMonthlyExpense">Добавить</button></div>
+            <div id="monthlyExpenseList" class="stack"></div>
+          </section>
+
+          <section class="group">
+            <div class="group-head"><div class="group-title">Материальные расходы</div><button class="text-button" id="btnAddMaterial">Добавить</button></div>
+            <div id="materialsList" class="stack"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="settings">
+        <div class="content">
+          <div class="section-intro"><h2>Параметры</h2><p>Ставки здесь являются настройками модели, а не справочником законодательства. Для конкретного периода их нужно проверять и менять при необходимости.</p></div>
+
+          <section class="group"><div class="group-title">Налоги и выплаты</div><div class="form-card grouped">
+            <label class="field-row"><span>НДФЛ, %</span><input data-setting="ndfl" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>УСН с доходов, %</span><input data-setting="usn" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>НДС применяется</span><input class="ios-switch" data-setting-check="vatEnabled" type="checkbox" /></label>
+            <label class="field-row"><span>НДС, %</span><input data-setting="vat" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>Оклад gross по умолчанию</span><input data-setting="salaryGrossBase" type="number" step="1000" inputmode="decimal" /></label>
+            <label class="field-row"><span>Агент, %</span><input data-setting="agentPercent" type="number" step="0.1" inputmode="decimal" /></label>
+          </div></section>
+
+          <section class="group"><div class="group-title">Страховые взносы</div><div class="form-card grouped">
+            <label class="field-row"><span>МРОТ</span><input data-setting="mrot" type="number" step="1" inputmode="decimal" /></label>
+            <label class="field-row"><span>До 1,5 МРОТ, %</span><input data-setting="insuranceBase" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>Сверх 1,5 МРОТ, %</span><input data-setting="insuranceAbove" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>НС/ПЗ, %</span><input data-setting="accident" type="number" step="0.01" inputmode="decimal" /></label>
+            <label class="field-row"><span>Отпускной резерв, окладов/год</span><input data-setting="vacationSalaryPart" type="number" step="0.1" inputmode="decimal" /></label>
+          </div></section>
+
+          <section class="group"><div class="group-title">Цена и распределение</div><div class="form-card grouped">
+            <label class="field-row"><span>Накладные, %</span><input data-setting="overhead" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>Прибыль к затратам, %</span><input data-setting="profitMarkup" type="number" step="0.1" inputmode="decimal" /></label>
+            <label class="field-row"><span>Распределять общие затраты</span><select id="allocationMethod"><option value="payroll">Пропорционально ФОТ постов</option><option value="posts">По количеству постов</option><option value="hours">По часам работы</option></select></label>
+          </div></section>
+
+          <section class="group"><div class="group-title">Данные</div><div class="button-stack">
+            <button class="secondary-button" id="btnImport">Импортировать JSON</button>
+            <input id="importFile" type="file" accept="application/json" hidden />
+            <button class="danger-button" id="btnReset">Сбросить локальные данные</button>
+          </div></section>
+
+          <section class="group"><div class="group-title">Методика</div><div class="form-card note-card">
+            <p><b>1.</b> Каждый пост задаёт режим работы и расчётную потребность в персонале.</p>
+            <p><b>2.</b> Себестоимость персонала учитывает официальный gross, доплату до целевой суммы «на руки», обратную комиссию агента, страховые взносы, НС/ПЗ и отпускной резерв.</p>
+            <p><b>3.</b> Общий персонал, ежемесячные и амортизируемые расходы добавляются к прямым затратам и распределяются на посты.</p>
+            <p><b>4.</b> Накладные начисляются на затраты. При расчётной цене выручка gross-up'ится на УСН так, чтобы заданная прибыль оставалась после налога.</p>
+          </div></section>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar glass" aria-label="Разделы">
+      <button class="tab active" data-nav="summary"><svg viewBox="0 0 24 24"><path d="M4 20V10l8-6 8 6v10h-6v-6h-4v6z"/></svg><span>Итог</span></button>
+      <button class="tab" data-nav="posts"><svg viewBox="0 0 24 24"><path d="M5 5h14v5H5zM5 14h14v5H5z"/></svg><span>Посты</span></button>
+      <button class="tab" data-nav="costs"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H4zM8 4v3m8-3v3M8 17v3m8-3v3"/></svg><span>Расходы</span></button>
+      <button class="tab" data-nav="settings"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0-5v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/></svg><span>Параметры</span></button>
+    </nav>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <section class="bottom-sheet" id="postSheet" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><button class="sheet-action" id="btnCancelPost">Отмена</button><strong id="postSheetTitle">Пост</strong><button class="sheet-action primary" id="btnSavePost">Готово</button></div>
+    <div class="sheet-body">
+      <div class="form-card grouped">
+        <label class="field-row"><span>Наименование</span><input id="postName" type="text" /></label>
+        <label class="field-row"><span>Количество постов</span><input id="postQuantity" type="number" min="0.1" step="0.1" inputmode="decimal" /></label>
+        <label class="field-row"><span>Работа поста, ч/сутки</span><input id="postCoverageHours" type="number" min="1" max="24" step="0.5" inputmode="decimal" /></label>
+        <label class="field-row"><span>Дней в месяце</span><input id="postDaysPerMonth" type="number" min="1" max="31" step="0.01" inputmode="decimal" /></label>
+        <label class="field-row"><span>Одновременно на посту</span><input id="postSimultaneous" type="number" min="0.1" step="0.1" inputmode="decimal" /></label>
+      </div>
+
+      <div class="sheet-section-title">График персонала</div>
+      <div class="form-card grouped">
+        <label class="field-row"><span>График</span><select id="postSchedule"></select></label>
+        <label class="field-row"><span>Часов в смене</span><input id="postShiftHours" type="number" min="1" max="24" step="0.5" inputmode="decimal" /></label>
+        <label class="field-row"><span>Рабочих дней / сотрудника</span><input id="postEmployeeDays" type="number" min="0" max="31" step="0.01" inputmode="decimal" /></label>
+        <label class="field-row"><span>Вахт / ротаций</span><input id="postRotations" type="number" min="0.1" step="0.1" inputmode="decimal" /></label>
+      </div>
+      <div class="live-calc" id="postStaffPreview"></div>
+
+      <div class="sheet-section-title">Оплата сотрудника</div>
+      <div class="form-card grouped">
+        <label class="field-row"><span>Режим оплаты</span><select id="postWageMode"><option value="hourly">На руки за час</option><option value="daily">На руки за смену/сутки</option><option value="fixed">Фикс на руки / месяц</option></select></label>
+        <label class="field-row wage hourly"><span>Ставка, ₽/час</span><input id="postHourlyNet" type="number" min="0" step="10" inputmode="decimal" /></label>
+        <label class="field-row wage daily hidden"><span>Ставка за смену, ₽</span><input id="postDailyNet" type="number" min="0" step="100" inputmode="decimal" /></label>
+        <label class="field-row wage fixed hidden"><span>Фикс на руки, ₽</span><input id="postFixedNet" type="number" min="0" step="1000" inputmode="decimal" /></label>
+        <label class="field-row"><span>Оформление</span><select id="postEmployment"><option value="partial">Официальная часть + доплата</option><option value="white">Полностью белая зарплата</option><option value="none">Без официальной части</option></select></label>
+        <label class="field-row"><span>Индивид. оклад gross</span><input id="postCustomGross" type="number" min="0" step="1000" inputmode="decimal" placeholder="общий из параметров" /></label>
+        <label class="field-row"><span>Прочие расходы / сотрудника</span><input id="postMiscPerEmployee" type="number" min="0" step="100" inputmode="decimal" /></label>
+        <label class="field-row"><span>Прямые расходы поста / мес.</span><input id="postDirectExpense" type="number" min="0" step="100" inputmode="decimal" /></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="bottom-sheet compact" id="genericSheet" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><button class="sheet-action" id="btnCancelGeneric">Отмена</button><strong id="genericTitle">Добавить</strong><button class="sheet-action primary" id="btnSaveGeneric">Готово</button></div>
+    <div class="sheet-body" id="genericBody"></div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
