@@ -10,10 +10,10 @@
   <meta name="apple-mobile-web-app-title" content="Рентабельность" />
   <meta name="format-detection" content="telephone=no" />
   <title>AlterNative — Рентабельность договора</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="manifest" href="./manifest.webmanifest?v=103" />
   <link rel="apple-touch-icon" href="./icons/icon-180.png" />
   <link rel="icon" href="./icons/icon-192.png" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=103" />
 </head>
 <body>
   <div class="app-shell">
@@ -64,6 +64,8 @@
               <label class="field-row"><span>Объект</span><input id="contractName" type="text" autocomplete="off" /></label>
               <label class="field-row"><span>Номер</span><input id="contractNumber" type="text" autocomplete="off" placeholder="необязательно" /></label>
               <label class="field-row"><span>Срок, мес.</span><input id="contractMonths" type="number" min="1" step="1" inputmode="decimal" /></label>
+              <label class="field-row"><span>Расчётный месяц</span><select id="contractDaysMode"><option value="default">По умолчанию</option><option value="custom">Для этого договора</option></select></label>
+              <label class="field-row contract-days-row hidden"><span>Дней в месяце</span><input id="contractDaysOverride" type="number" min="1" max="31" step="0.01" inputmode="decimal" /></label>
               <label class="field-row"><span>Цена договора</span><select id="priceMode"><option value="calculated">Рассчитать автоматически</option><option value="manual">Задать вручную</option></select></label>
               <label class="field-row manual-price-row hidden"><span>Сумма</span><input id="manualPrice" type="number" min="0" step="1000" inputmode="decimal" /></label>
               <label class="field-row manual-price-row hidden"><span>Сумма включает НДС</span><input class="ios-switch" id="manualIncludesVat" type="checkbox" /></label>
@@ -84,9 +86,7 @@
 
       <section class="screen" data-screen="posts">
         <div class="content">
-          <div class="section-intro">
-            <p>Расчёт начинается с поста. График поста определяет потребность в персонале, а уже персонал формирует ФОТ и себестоимость.</p>
-          </div>
+          <div class="section-intro"><p>Расчёт начинается с поста. График поста определяет потребность в персонале, а уже персонал формирует ФОТ и себестоимость.</p></div>
           <div id="postsList" class="stack"></div>
           <button class="primary-button" id="btnAddPost">Добавить пост</button>
         </div>
@@ -135,6 +135,7 @@
           </div></section>
 
           <section class="group"><div class="group-title">Цена и распределение</div><div class="form-card grouped">
+            <label class="field-row"><span>Дней в расчётном месяце</span><input data-setting="daysPerMonth" type="number" min="1" max="31" step="0.01" inputmode="decimal" /></label>
             <label class="field-row"><span>Накладные, %</span><input data-setting="overhead" type="number" step="0.1" inputmode="decimal" /></label>
             <label class="field-row"><span>Прибыль к затратам, %</span><input data-setting="profitMarkup" type="number" step="0.1" inputmode="decimal" /></label>
             <label class="field-row"><span>Распределять общие затраты</span><select id="allocationMethod"><option value="payroll">Пропорционально ФОТ постов</option><option value="posts">По количеству постов</option><option value="hours">По часам работы</option></select></label>
@@ -170,30 +171,40 @@
     <div class="sheet-header"><button class="sheet-action" id="btnCancelPost">Отмена</button><strong id="postSheetTitle">Пост</strong><button class="sheet-action primary" id="btnSavePost">Готово</button></div>
     <div class="sheet-body">
       <div class="form-card grouped">
-        <label class="field-row"><span>Наименование</span><input id="postName" type="text" /></label>
-        <label class="field-row"><span>Количество постов</span><input id="postQuantity" type="number" min="0.1" step="0.1" inputmode="decimal" /></label>
-        <label class="field-row"><span>Работа поста, ч/сутки</span><input id="postCoverageHours" type="number" min="1" max="24" step="0.5" inputmode="decimal" /></label>
-        <label class="field-row"><span>Дней в месяце</span><input id="postDaysPerMonth" type="number" min="1" max="31" step="0.01" inputmode="decimal" /></label>
-        <label class="field-row"><span>Одновременно на посту</span><input id="postSimultaneous" type="number" min="0.1" step="0.1" inputmode="decimal" /></label>
+        <label class="field-row"><span>Наименование поста</span><input id="postName" type="text" placeholder="Например, КПП №1" /></label>
+        <label class="field-row"><span>Режим поста</span><select id="postCoverageMode">
+          <option value="round">Круглосуточный · 24 ч</option>
+          <option value="day">Дневной · 12 ч</option>
+          <option value="night">Ночной · 12 ч</option>
+          <option value="custom">Свой режим</option>
+        </select></label>
+        <label class="field-row coverage-custom-row hidden"><span>Часов работы в сутки</span><input id="postCoverageHours" type="number" min="1" max="24" step="0.5" inputmode="decimal" /></label>
+        <label class="field-row"><span>Сотрудников на посту</span><select id="postStaffingMode"><option value="uniform">Одинаково весь пост</option><option value="split">Днём и ночью по-разному</option></select></label>
+        <label class="field-row staffing-uniform-row"><span>Одновременно</span><select id="postSimultaneous"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+        <label class="field-row staffing-day-row hidden"><span>Днём</span><select id="postDayCount"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+        <label class="field-row staffing-night-row hidden"><span>Ночью</span><select id="postNightCount"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
       </div>
 
       <div class="sheet-section-title">График персонала</div>
       <div class="form-card grouped">
         <label class="field-row"><span>График</span><select id="postSchedule"></select></label>
-        <label class="field-row"><span>Часов в смене</span><input id="postShiftHours" type="number" min="1" max="24" step="0.5" inputmode="decimal" /></label>
-        <label class="field-row"><span>Рабочих дней / сотрудника</span><input id="postEmployeeDays" type="number" min="0" max="31" step="0.01" inputmode="decimal" /></label>
-        <label class="field-row"><span>Вахт / ротаций</span><input id="postRotations" type="number" min="0.1" step="0.1" inputmode="decimal" /></label>
+        <label class="field-row custom-shift-row hidden"><span>Часов в смене</span><input id="postShiftHours" type="number" min="1" max="24" step="0.5" inputmode="decimal" /></label>
+        <label class="field-row"><span>Рабочих дней сотрудника</span><select id="postEmployeeDays">
+          <option value="15.25">15,25</option><option value="20.67">20,67 · 5/2</option><option value="10.17">10,17 · сутки 1/2</option><option value="7.67">7,67 · сутки 1/3</option>
+        </select></label>
+        <label class="field-row rotations-row"><span>Вахт / ротаций</span><select id="postRotations"><option value="1">1</option><option value="2">2</option></select></label>
       </div>
       <div class="live-calc" id="postStaffPreview"></div>
 
       <div class="sheet-section-title">Оплата сотрудника</div>
       <div class="form-card grouped">
-        <label class="field-row"><span>Режим оплаты</span><select id="postWageMode"><option value="hourly">На руки за час</option><option value="daily">На руки за смену/сутки</option><option value="fixed">Фикс на руки / месяц</option></select></label>
+        <label class="field-row"><span>Режим оплаты</span><select id="postWageMode"><option value="hourly">На руки за час</option><option value="shift">На руки за смену</option><option value="daily">На руки за сутки</option><option value="fixed">Фиксированно на руки / месяц</option></select></label>
         <label class="field-row wage hourly"><span>Ставка, ₽/час</span><input id="postHourlyNet" type="number" min="0" step="10" inputmode="decimal" /></label>
-        <label class="field-row wage daily hidden"><span>Ставка за смену, ₽</span><input id="postDailyNet" type="number" min="0" step="100" inputmode="decimal" /></label>
+        <label class="field-row wage shift hidden"><span>Ставка за смену, ₽</span><input id="postShiftNet" type="number" min="0" step="100" inputmode="decimal" /></label>
+        <label class="field-row wage daily hidden"><span>Ставка за сутки, ₽</span><input id="postDailyNet" type="number" min="0" step="100" inputmode="decimal" /></label>
         <label class="field-row wage fixed hidden"><span>Фикс на руки, ₽</span><input id="postFixedNet" type="number" min="0" step="1000" inputmode="decimal" /></label>
-        <label class="field-row"><span>Оформление</span><select id="postEmployment"><option value="partial">Официальная часть + доплата</option><option value="white">Полностью белая зарплата</option><option value="none">Без официальной части</option></select></label>
-        <label class="field-row"><span>Индивид. оклад gross</span><input id="postCustomGross" type="number" min="0" step="1000" inputmode="decimal" placeholder="общий из параметров" /></label>
+        <label class="field-row"><span>Оформление</span><select id="postEmployment"><option value="white">Официальная часть</option><option value="partial">Официальная часть + доплата</option><option value="none">Без официальной части</option></select></label>
+        <label class="field-row"><span>Индивидуальный оклад gross</span><input id="postCustomGross" type="number" min="0" step="1000" inputmode="decimal" placeholder="из общих параметров" /></label>
         <label class="field-row"><span>Прочие расходы / сотрудника</span><input id="postMiscPerEmployee" type="number" min="0" step="100" inputmode="decimal" /></label>
         <label class="field-row"><span>Прямые расходы поста / мес.</span><input id="postDirectExpense" type="number" min="0" step="100" inputmode="decimal" /></label>
       </div>
@@ -207,6 +218,6 @@
   </section>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="./app.js"></script>
+  <script src="./app.js?v=103"></script>
 </body>
 </html>
