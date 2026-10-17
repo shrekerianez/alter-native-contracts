@@ -166,7 +166,8 @@
     const about=groups.find(g=>g.querySelector('.group-title')?.textContent.trim()==='О приложении');
     if(about){
       const card=about.querySelector('.form-card');
-      if(card){
+      if(card&&card.dataset.anAbout!==APP_VERSION){
+        card.dataset.anAbout=APP_VERSION;
         card.innerHTML=`<div class="field-row"><span>Версия</span><strong>${APP_VERSION}</strong></div><div class="field-row"><span>Сборка</span><strong>${APP_BUILD}</strong></div><div class="field-row"><span>Платформа</span><strong>iOS 27 · WebKit</strong></div>`;
       }
     }
@@ -216,7 +217,11 @@
     const list=document.getElementById('anWarningList');
     if(list){
       const w=overallWarnings(c);
-      list.innerHTML=w.length?w.map(x=>`<div class="an-warning ${x.level}"><span class="an-warning-dot"></span><div><strong>${esc(x.title)}</strong><p>${esc(x.text)}</p></div></div>`).join(''):'<div class="an-warning info"><span class="an-warning-dot"></span><div><strong>Расчёт выглядит согласованно</strong><p>Критических несоответствий по текущим данным не найдено.</p></div></div>';
+      const signature=JSON.stringify(w);
+      if(list.dataset.signature!==signature){
+        list.dataset.signature=signature;
+        list.innerHTML=w.length?w.map(x=>`<div class="an-warning ${x.level}"><span class="an-warning-dot"></span><div><strong>${esc(x.title)}</strong><p>${esc(x.text)}</p></div></div>`).join(''):'<div class="an-warning info"><span class="an-warning-dot"></span><div><strong>Расчёт выглядит согласованно</strong><p>Критических несоответствий по текущим данным не найдено.</p></div></div>';
+      }
     }
   }
 
