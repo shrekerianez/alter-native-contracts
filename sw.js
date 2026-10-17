@@ -1,10 +1,11 @@
-const CACHE = 'alternative-rentability-ios27-1.0.1';
+const CACHE = 'alternative-rentability-ios27-1.1.0';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './app-v2.js',
+  './enhancements-v1.js',
   './manifest.webmanifest',
   './icons/icon-180.png',
   './icons/icon-192.png',
