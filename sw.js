@@ -1,4 +1,4 @@
-const CACHE = 'alternative-rentability-ios27-1';
+const CACHE = 'alternative-rentability-ios27-1.0.1';
 const ASSETS = [
   './',
   './index.html',
