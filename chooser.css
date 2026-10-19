@@ -1,0 +1,17 @@
+/* AlterNative calculator selector, isolated from calculator styling */
+.an-picker-trigger{position:absolute;left:max(10px,env(safe-area-inset-left));top:calc(env(safe-area-inset-top) + 4px);height:44px;min-width:70px;padding:0 10px;border:0;border-radius:12px;background:transparent;color:var(--accent,#007aff);font:600 15px -apple-system,BlinkMacSystemFont,sans-serif;z-index:2}
+.an-picker-trigger:active{background:var(--surface-2,rgba(120,120,128,.15))}
+.an-picker-cover{position:fixed;inset:0;z-index:500;display:grid;place-items:center;overflow:auto;padding:calc(22px + env(safe-area-inset-top)) max(18px,env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom));background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px)}
+.an-picker-cover[hidden]{display:none!important}
+.an-picker-panel{width:min(100%,430px);max-height:100%;overflow-y:auto;padding:22px 18px 18px;border-radius:25px;background:var(--surface-solid,#fff);color:var(--text,#111);box-shadow:0 25px 70px rgba(0,0,0,.25);font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+.an-picker-kicker{font-size:13px;font-weight:700;color:var(--secondary,#777);margin:0 0 7px}
+.an-picker-title{font-size:27px;line-height:32px;font-weight:750;letter-spacing:-.025em;margin:0 0 10px}
+.an-picker-intro{font-size:14px;line-height:21px;color:var(--secondary,#777);margin:0 0 19px}
+.an-picker-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;border:0;border-radius:16px;background:var(--surface-2,rgba(120,120,128,.12));color:var(--text,#111);text-decoration:none;text-align:left;min-height:85px;margin-bottom:10px}
+.an-picker-option:active{opacity:.72}
+.an-picker-option strong{display:block;font-size:17px;line-height:22px}
+.an-picker-option small{display:block;color:var(--secondary,#777);font-size:13px;line-height:19px;margin-top:4px}
+.an-picker-chevron{font-size:25px;color:var(--accent,#007aff);flex:none}
+.an-picker-disclaimer{font-size:12px;line-height:18px;color:var(--secondary,#777);padding:3px 4px 7px}
+.an-picker-cancel{width:100%;min-height:48px;border:0;background:transparent;color:var(--accent,#007aff);font:600 16px -apple-system,sans-serif;border-radius:12px}
+@media(prefers-reduced-motion:reduce){.an-picker-cover{-webkit-backdrop-filter:none;backdrop-filter:none}}
