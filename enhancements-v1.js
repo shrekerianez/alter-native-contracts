@@ -2,8 +2,8 @@
   'use strict';
 
   const STORAGE_KEY='alternative-rentability-v1';
-  const APP_VERSION='1.1.0';
-  const APP_BUILD='14';
+  const APP_VERSION='1.2.0';
+  const APP_BUILD='15';
   const SCHEDULES={
     shift16:{label:'Вахта 16/8',h:16,d:15.25,r:2},
     shift12:{label:'Вахта 12/12',h:12,d:15.25,r:2},
