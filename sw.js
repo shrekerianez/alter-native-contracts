@@ -1,4 +1,4 @@
-const CACHE = 'alternative-rentability-ios27-1.1.0';
+const CACHE = 'alternative-rentability-ios27-1.2.0';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,10 @@ const ASSETS = [
   './app.js',
   './app-v2.js',
   './enhancements-v1.js',
+  './chooser.css',
+  './chooser.js',
+  './gemini/index.html',
+  './gemini/original.html',
   './manifest.webmanifest',
   './icons/icon-180.png',
   './icons/icon-192.png',
